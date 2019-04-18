@@ -142,7 +142,7 @@ public class TracedFilterChainBuilderTest extends AbstractHttpTest {
 
 	private void setupServer(Function<FilterChainContext, NextAction> nextActionSupplier) throws Exception {
 		// Create a FilterChain using TracedFilterChainBuilder
-		FilterChainBuilder filterChainBuilder = new TracedFilterChainBuilder();
+		FilterChainBuilder filterChainBuilder = new TracedFilterChainBuilder(GlobalTracer.get());
 
 		// Add TransportFilter, which is responsible
 		// for reading and writing data to the connection

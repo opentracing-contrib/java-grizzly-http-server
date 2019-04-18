@@ -1,6 +1,7 @@
 package io.opentracing.contrib.grizzly.http.server;
 
 import io.opentracing.contrib.specialagent.AgentRunner;
+import io.opentracing.contrib.specialagent.AgentRunner.Config.Log;
 import io.opentracing.mock.MockSpan;
 import io.opentracing.mock.MockTracer;
 import io.opentracing.util.GlobalTracer;
@@ -23,9 +24,18 @@ import static org.junit.Assert.assertEquals;
  * @author Jose Montoya
  */
 @RunWith(AgentRunner.class)
-@AgentRunner.Config(debug=true, verbose=true)
-public class HttpServerITest extends AbstractHttpTest {
+@AgentRunner.Config(log=Log.FINEST)
+public class HttpServerTest extends AbstractHttpTest {
 	private HttpServer httpServer;
+
+	static {
+	  try {
+      Class.forName("org.glassfish.grizzly.filterchain.FilterChainBuilder$StatelessFilterChainBuilder");
+    }
+    catch (final ClassNotFoundException e) {
+      throw new ExceptionInInitializerError(e);
+    }
+	}
 
 	@BeforeClass
 	public static void beforeClass(MockTracer tracer) throws Exception {
@@ -44,7 +54,7 @@ public class HttpServerITest extends AbstractHttpTest {
 	}
 
 	@After
-	public void after(MockTracer tracer) throws Exception {
+	public void after() throws Exception {
 		if (httpServer != null) {
 			httpServer.shutdownNow();
 		}
