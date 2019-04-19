@@ -20,7 +20,6 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 import java.util.Arrays;
 
 import io.opentracing.contrib.specialagent.AgentRule;
-import io.opentracing.contrib.specialagent.AgentRuleUtil;
 import io.opentracing.contrib.specialagent.EarlyReturnException;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.AgentBuilder.Transformer;
@@ -51,7 +50,7 @@ public class FilterChainAgentRule extends AgentRule {
   public static class OnEnter {
     @Advice.OnMethodEnter
     public static void enter(final @Advice.Origin String origin, final @Advice.This Object thiz) throws Exception {
-      if (!AgentRuleUtil.isEnabled(origin))
+      if (!isEnabled(origin))
         return;
 
       final Object filterChain = FilterChainAgentIntercept.enter(thiz);

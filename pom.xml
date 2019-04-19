@@ -36,7 +36,7 @@
         <version.org.glassfish.grizzly>2.3.35</version.org.glassfish.grizzly>
         <version.io.opentracing>0.31.0</version.io.opentracing>
         <version.io.opentracing-concurrent>0.2.0</version.io.opentracing-concurrent>
-        <version.specialagent>1.1.0-SNAPSHOT</version.specialagent>
+        <version.specialagent>1.1.0</version.specialagent>
         <version.bytebuddy>1.9.11</version.bytebuddy>
         <version.junit>4.12</version.junit>
         <version.maven-surefire-plugin>2.22.1</version.maven-surefire-plugin>
