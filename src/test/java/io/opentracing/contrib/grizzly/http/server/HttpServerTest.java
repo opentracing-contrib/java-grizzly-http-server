@@ -1,36 +1,33 @@
 package io.opentracing.contrib.grizzly.http.server;
 
-import io.opentracing.contrib.specialagent.AgentRunner;
-import io.opentracing.mock.MockSpan;
-import io.opentracing.mock.MockTracer;
-import io.opentracing.util.GlobalTracer;
-import org.glassfish.grizzly.http.HttpContent;
-import org.glassfish.grizzly.http.HttpPacket;
-import org.glassfish.grizzly.http.HttpResponsePacket;
-import org.glassfish.grizzly.http.server.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.glassfish.grizzly.http.server.NetworkListener.*;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
-import static org.glassfish.grizzly.http.server.NetworkListener.DEFAULT_NETWORK_HOST;
-import static org.junit.Assert.assertEquals;
+import org.glassfish.grizzly.http.HttpContent;
+import org.glassfish.grizzly.http.HttpPacket;
+import org.glassfish.grizzly.http.HttpResponsePacket;
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.grizzly.http.server.Response;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import io.opentracing.contrib.specialagent.AgentRunner;
+import io.opentracing.mock.MockSpan;
+import io.opentracing.mock.MockTracer;
 
 /**
  * @author Jose Montoya
  */
 @RunWith(AgentRunner.class)
-@AgentRunner.Config(debug=true, verbose=true)
-public class HttpServerITest extends AbstractHttpTest {
+public class HttpServerTest extends AbstractHttpTest {
 	private HttpServer httpServer;
-
-	@BeforeClass
-	public static void beforeClass(MockTracer tracer) throws Exception {
-		GlobalTracer.register(tracer);
-	}
 
 	@Before
 	public void before(MockTracer tracer) throws Exception {
@@ -44,7 +41,7 @@ public class HttpServerITest extends AbstractHttpTest {
 	}
 
 	@After
-	public void after(MockTracer tracer) throws Exception {
+	public void after() throws Exception {
 		if (httpServer != null) {
 			httpServer.shutdownNow();
 		}
