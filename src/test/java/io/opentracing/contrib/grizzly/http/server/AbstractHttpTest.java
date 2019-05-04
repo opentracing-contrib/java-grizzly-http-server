@@ -26,11 +26,11 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 /**
  * @author Jose Montoya
  */
-abstract class AbstractHttpTest {
-	static final int PORT = 18906;
-	static final String LOCALHOST = "localhost";
+public abstract class AbstractHttpTest {
+	protected static final int PORT = 18906;
+	protected static final String LOCALHOST = "localhost";
 
-	HttpPacket createRequest(String uri, Map<String, String> headers) {
+	protected HttpPacket createRequest(String uri, Map<String, String> headers) {
 		HttpRequestPacket.Builder b = HttpRequestPacket.builder();
 		b.method(Method.GET).protocol(Protocol.HTTP_1_1).uri(uri).header("Host", LOCALHOST);
 		if (headers != null) {
@@ -42,7 +42,7 @@ abstract class AbstractHttpTest {
 		return b.build();
 	}
 
-	HttpContent send(HttpPacket request, TCPNIOTransport transport) throws Exception {
+	protected HttpContent send(HttpPacket request, TCPNIOTransport transport) throws Exception {
 		FutureImpl<HttpContent> testResultFuture = SafeFutureImpl.create();
 
 		FilterChainBuilder clientFilterChainBuilder = FilterChainBuilder.stateless();

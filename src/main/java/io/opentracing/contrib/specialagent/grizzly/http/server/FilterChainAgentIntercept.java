@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-package io.opentracing.contrib.grizzly.http.server;
+package io.opentracing.contrib.specialagent.grizzly.http.server;
 
+import io.opentracing.contrib.grizzly.http.server.TracedFilterChainBuilder;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 
 import io.opentracing.contrib.specialagent.AgentRuleUtil;
@@ -23,7 +24,8 @@ import net.bytebuddy.asm.Advice;
 
 public class FilterChainAgentIntercept {
   public static Object enter(final @Advice.This Object thiz) {
-    if (AgentRuleUtil.callerEquals(1, 3, "io.opentracing.contrib.grizzly.http.server.TracedFilterChainBuilder.build", "io.opentracing.contrib.grizzly.http.server.TracedFilterChainBuilder.buildFrom"))
+    if (AgentRuleUtil.callerEquals(1, 3, "io.opentracing.contrib.grizzly.http.server.TracedFilterChainBuilder.build"))
+    if (AgentRuleUtil.callerEquals(1, 3, "io.opentracing.contrib.grizzly.http.server.TracedFilterChainBuilder.build"))
       return null;
 
     return new TracedFilterChainBuilder((FilterChainBuilder)thiz, GlobalTracer.get()).build();

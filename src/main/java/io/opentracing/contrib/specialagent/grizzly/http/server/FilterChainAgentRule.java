@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package io.opentracing.contrib.grizzly.http.server;
+package io.opentracing.contrib.specialagent.grizzly.http.server;
 
 import static net.bytebuddy.matcher.ElementMatchers.*;
 

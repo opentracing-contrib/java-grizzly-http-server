@@ -1,10 +1,11 @@
-package io.opentracing.contrib.grizzly.http.server;
+package io.opentracing.contrib.specialagent.grizzly.http.server;
 
 import static org.glassfish.grizzly.http.server.NetworkListener.*;
 import static org.junit.Assert.*;
 
 import java.util.List;
 
+import io.opentracing.contrib.grizzly.http.server.AbstractHttpTest;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
