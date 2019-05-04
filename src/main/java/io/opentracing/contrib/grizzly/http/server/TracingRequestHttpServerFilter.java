@@ -3,6 +3,7 @@ package io.opentracing.contrib.grizzly.http.server;
 import java.io.IOException;
 import java.util.Map;
 
+import io.opentracing.*;
 import org.glassfish.grizzly.filterchain.Filter;
 import org.glassfish.grizzly.filterchain.FilterChain;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -11,10 +12,6 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 
-import io.opentracing.Scope;
-import io.opentracing.Span;
-import io.opentracing.SpanContext;
-import io.opentracing.Tracer;
 import io.opentracing.propagation.Format;
 import io.opentracing.tag.Tags;
 
@@ -42,26 +39,28 @@ public class TracingRequestHttpServerFilter implements Filter {
 
 				SpanContext extractedContext = tracer.extract(Format.Builtin.HTTP_HEADERS,
 						new GizzlyHttpRequestPacketAdapter(request));
-				final Scope scope = tracer.buildSpan("HTTP::" + request.getMethod().getMethodString())
+				final Span span = tracer.buildSpan("HTTP::" + request.getMethod().getMethodString())
 						.ignoreActiveSpan()
 						.asChildOf(extractedContext)
 						.withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
-						.startActive(false);
+						.start();
 
-				Tags.COMPONENT.set(scope.span(), "java-grizzly-http-server");
-				Tags.HTTP_METHOD.set(scope.span(), request.getMethod().getMethodString());
-				Tags.HTTP_URL.set(scope.span(), request.getRequestURI());
+				final Scope scope = tracer.scopeManager().activate(span);
+
+				Tags.COMPONENT.set(span, "java-grizzly-http-server");
+				Tags.HTTP_METHOD.set(span, request.getMethod().getMethodString());
+				Tags.HTTP_URL.set(span, request.getRequestURI());
 
 				ctx.addCompletionListener(new FilterChainContext.CompletionListener() {
 					@Override
 					public void onComplete(FilterChainContext context) {
-						scope.span().finish();
+						span.finish();
 						scope.close();
 						weakRequestMap.remove(request);
 					}
 				});
 
-				weakRequestMap.put(request, scope.span());
+				weakRequestMap.put(request, span);
 
 				NextAction delegateNextAction = delegate.handleRead(ctx);
 				if (delegateNextAction.equals(ctx.getSuspendAction())) {

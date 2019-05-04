@@ -32,7 +32,7 @@ public class TracedFilterChainBuilderTest extends AbstractHttpTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		GlobalTracer.register(tracer);
+		GlobalTracer.registerIfAbsent(tracer);
 	}
 
 	@Before
