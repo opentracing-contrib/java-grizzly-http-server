@@ -72,7 +72,7 @@
 		<version.coveralls-maven-plugin>4.3.0</version.coveralls-maven-plugin>
 		<version.formatter>2.9.0</version.formatter>
 		<version.io.opentracing>0.32.0</version.io.opentracing>
-		<version.io.opentracing-concurrent>0.2.0</version.io.opentracing-concurrent>
+		<version.io.opentracing-concurrent>0.3.0</version.io.opentracing-concurrent>
 		<version.jacoco-maven-plugin>0.8.2</version.jacoco-maven-plugin>
 		<version.junit>4.12</version.junit>
 		<version.maven-surefire-plugin>2.22.1</version.maven-surefire-plugin>
@@ -265,6 +265,7 @@
 			<plugin>
 				<groupId>com.github.ekryd.sortpom</groupId>
 				<artifactId>sortpom-maven-plugin</artifactId>
+				<version>2.10.0</version>
 				<configuration>
 					<createBackupFile>false</createBackupFile>
 					<expandEmptyElements>false</expandEmptyElements>
@@ -292,15 +293,6 @@
 						<phase>process-resources</phase>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>${version.maven-surefire-plugin}</version>
-				<configuration>
-					<trimStackTrace>false</trimStackTrace>
-					<reuseForks>false</reuseForks>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.eluder.coveralls</groupId>

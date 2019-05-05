@@ -14,6 +14,7 @@
 package io.opentracing.contrib.grizzly.http.server;
 
 import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.contrib.concurrent.TracedExecutorService;
 import io.opentracing.mock.MockSpan;
 import io.opentracing.mock.MockTracer;
@@ -94,8 +95,12 @@ public class TracedFilterChainBuilderTest extends AbstractHttpTest {
 		setupServer(new Function<FilterChainContext, NextAction>() {
 			@Override
 			public NextAction apply(FilterChainContext ctx) {
-				Scope scope = tracer.buildSpan("child").startActive(true);
+				Span span = tracer.buildSpan("child").start();
+				Scope scope = tracer.scopeManager().activate(span);
+
 				writeEmptyResponse(ctx);
+
+				span.finish();
 				scope.close();
 
 				return ctx.getStopAction();
@@ -112,6 +117,7 @@ public class TracedFilterChainBuilderTest extends AbstractHttpTest {
 		assertEquals(2, spans.size());
 
 		assertEquals(spans.get(0).context().traceId(), spans.get(1).context().traceId());
+		assertEquals(spans.get(0).operationName(), "child");
 		assertEquals(spans.get(0).parentId(), spans.get(1).context().spanId());
 	}
 
@@ -123,13 +129,17 @@ public class TracedFilterChainBuilderTest extends AbstractHttpTest {
 				new TracedExecutorService(Executors.newFixedThreadPool(2), tracer).submit(new Runnable() {
 					@Override
 					public void run() {
-						Scope scope = tracer.buildSpan("child").startActive(true);
+						Span span = tracer.buildSpan("async-child").start();
+						Scope scope = tracer.scopeManager().activate(span);
+
 						try {
 							Thread.sleep(200);
 							writeEmptyResponse(ctx);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
+
+						span.finish();
 						scope.close();
 
 						ctx.resume(ctx.getStopAction());
@@ -150,12 +160,13 @@ public class TracedFilterChainBuilderTest extends AbstractHttpTest {
 		assertEquals(2, spans.size());
 
 		assertEquals(spans.get(0).context().traceId(), spans.get(1).context().traceId());
+		assertEquals(spans.get(0).operationName(), "async-child");
 		assertEquals(spans.get(0).parentId(), spans.get(1).context().spanId());
 	}
 
 	private void setupServer(Function<FilterChainContext, NextAction> nextActionSupplier) throws Exception {
 		// Create a FilterChain using TracedFilterChainBuilder
-		FilterChainBuilder filterChainBuilder = new TracedFilterChainBuilder(GlobalTracer.get());
+		FilterChainBuilder filterChainBuilder = new TracedFilterChainBuilder(tracer);
 
 		// Add TransportFilter, which is responsible
 		// for reading and writing data to the connection
