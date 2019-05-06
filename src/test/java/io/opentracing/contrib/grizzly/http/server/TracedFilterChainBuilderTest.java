@@ -13,6 +13,8 @@
  */
 package io.opentracing.contrib.grizzly.http.server;
 
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Response;
 import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.contrib.concurrent.TracedExecutorService;
@@ -31,7 +33,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 
@@ -71,11 +75,13 @@ public class TracedFilterChainBuilderTest extends AbstractHttpTest {
 			}
 		});
 
-		HttpPacket request = createRequest("/", null);
-		HttpContent responseContent = send(request, transport);
+		Response response;
 
-		HttpResponsePacket responsePacket = (HttpResponsePacket) responseContent.getHttpHeader();
-		assertEquals(200, responsePacket.getStatus());
+		try (AsyncHttpClient client = new AsyncHttpClient()) {
+			response = client.prepareGet(new URL("http", LOCALHOST, PORT, "/").toString()).execute().get();
+		}
+
+		assertEquals(200, response.getStatusCode());
 
 		List<MockSpan> spans = tracer.finishedSpans();
 		assertEquals(1, spans.size());
@@ -107,11 +113,13 @@ public class TracedFilterChainBuilderTest extends AbstractHttpTest {
 			}
 		});
 
-		HttpPacket request = createRequest("/", null);
-		HttpContent responseContent = send(request, transport);
+		Response response;
 
-		HttpResponsePacket responsePacket = (HttpResponsePacket) responseContent.getHttpHeader();
-		assertEquals(200, responsePacket.getStatus());
+		try (AsyncHttpClient client = new AsyncHttpClient()) {
+			response = client.prepareGet(new URL("http", LOCALHOST, PORT, "/").toString()).execute().get();
+		}
+
+		assertEquals(200, response.getStatusCode());
 
 		List<MockSpan> spans = tracer.finishedSpans();
 		assertEquals(2, spans.size());
@@ -123,16 +131,19 @@ public class TracedFilterChainBuilderTest extends AbstractHttpTest {
 
 	@Test
 	public void testAsyncResponseWithChild() throws Exception {
+		final ExecutorService executorService = new TracedExecutorService(Executors.newFixedThreadPool(2), tracer);
+
 		setupServer(new Function<FilterChainContext, NextAction>() {
 			@Override
 			public NextAction apply(FilterChainContext ctx) {
-				new TracedExecutorService(Executors.newFixedThreadPool(2), tracer).submit(new Runnable() {
+				executorService.submit(new Runnable() {
 					@Override
 					public void run() {
 						Span span = tracer.buildSpan("async-child").start();
 						Scope scope = tracer.scopeManager().activate(span);
 
 						try {
+							System.out.println("runnable " + Thread.currentThread().getName());
 							Thread.sleep(200);
 							writeEmptyResponse(ctx);
 						} catch (InterruptedException e) {
@@ -150,11 +161,13 @@ public class TracedFilterChainBuilderTest extends AbstractHttpTest {
 			}
 		});
 
-		HttpPacket request = createRequest("/", null);
-		HttpContent responseContent = send(request, transport);
+		Response response;
 
-		HttpResponsePacket responsePacket = (HttpResponsePacket) responseContent.getHttpHeader();
-		assertEquals(200, responsePacket.getStatus());
+		try (AsyncHttpClient client = new AsyncHttpClient()) {
+			response = client.prepareGet(new URL("http", LOCALHOST, PORT, "/").toString()).execute().get();
+		}
+
+		assertEquals(200, response.getStatusCode());
 
 		List<MockSpan> spans = tracer.finishedSpans();
 		assertEquals(2, spans.size());

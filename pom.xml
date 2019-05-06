@@ -76,7 +76,6 @@
 		<version.jacoco-maven-plugin>0.8.2</version.jacoco-maven-plugin>
 		<version.junit>4.12</version.junit>
 		<version.maven-surefire-plugin>2.22.1</version.maven-surefire-plugin>
-
 		<version.org.glassfish.grizzly>2.3.35</version.org.glassfish.grizzly>
 		<version.specialagent>1.1.1</version.specialagent>
 	</properties>
@@ -152,6 +151,13 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${version.junit}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.grizzly</groupId>
+			<artifactId>grizzly-http-client</artifactId>
+			<version>1.15</version>
 			<scope>test</scope>
 		</dependency>
 
