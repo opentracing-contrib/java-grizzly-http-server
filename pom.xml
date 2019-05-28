@@ -68,7 +68,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version.bytebuddy>1.9.11</version.bytebuddy>
+		<version.bytebuddy>1.9.13</version.bytebuddy>
 		<version.coveralls-maven-plugin>4.3.0</version.coveralls-maven-plugin>
 		<version.formatter>2.9.0</version.formatter>
 		<version.io.opentracing>0.32.0</version.io.opentracing>
