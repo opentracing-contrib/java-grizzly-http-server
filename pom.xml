@@ -111,14 +111,12 @@
 			<artifactId>grizzly-framework</artifactId>
 			<version>${version.org.glassfish.grizzly}</version>
 			<scope>provided</scope>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.grizzly</groupId>
 			<artifactId>grizzly-http</artifactId>
 			<version>${version.org.glassfish.grizzly}</version>
 			<scope>provided</scope>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>io.opentracing</groupId>
