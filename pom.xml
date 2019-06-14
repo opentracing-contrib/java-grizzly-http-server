@@ -19,7 +19,7 @@
 
 	<groupId>io.opentracing.contrib</groupId>
 	<artifactId>opentracing-grizzly-http-server</artifactId>
-	<version>0.1.2-SNAPSHOT</version>
+	<version>0.1.2</version>
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>OpenTracing Instrumentation for Grizzly HTTP Server</description>
@@ -45,7 +45,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/opentracing-contrib/java-grizzly-http-server.git</connection>
 		<developerConnection>scm:git:https://github.com/opentracing-contrib/java-grizzly-http-server.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>0.1.2</tag>
 		<url>https://github.com/opentracing-contrib/java-grizzly-http-server</url>
 	</scm>
 
