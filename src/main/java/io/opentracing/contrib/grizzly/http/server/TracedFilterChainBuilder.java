@@ -55,7 +55,7 @@ public class TracedFilterChainBuilder extends FilterChainBuilder.StatelessFilter
   }
 
   // Methods to facilitate custom instrumentation
-  private void addTracingFiltersAt(final int index) {
+  protected void addTracingFiltersAt(final int index) {
     final Map<HttpRequestPacket,Span> weakRequestMap = Collections.synchronizedMap(new WeakHashMap<HttpRequestPacket,Span>());
 
     final TracingResponseHttpServerFilter responseFilter = new TracingResponseHttpServerFilter(weakRequestMap, tracer);
