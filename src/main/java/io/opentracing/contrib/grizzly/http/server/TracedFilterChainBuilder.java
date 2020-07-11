@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChain;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.http.HttpRequestPacket;
@@ -30,6 +31,8 @@ import io.opentracing.Tracer;
  */
 public class TracedFilterChainBuilder extends FilterChainBuilder.StatelessFilterChainBuilder {
   private final Tracer tracer;
+  private Class<? extends BaseFilter> toWrapType = HttpServerFilter.class;
+  private int toWrapIdx = -1;
 
   public TracedFilterChainBuilder(final FilterChainBuilder builder, final Tracer tracer) {
     this.tracer = tracer;
@@ -40,29 +43,50 @@ public class TracedFilterChainBuilder extends FilterChainBuilder.StatelessFilter
     this.tracer = tracer;
   }
 
-  @Override
-  public FilterChain build() {
-    final int httpServerFilterIdx = this.indexOfType(HttpServerFilter.class);
-    if (httpServerFilterIdx != -1) {
-      // If contains an HttpServerFilter
-      addTracingFiltersAt(httpServerFilterIdx + 1);
-      return super.build();
-    }
 
-    // This must be an http client FilterChain, or a non http chain, or some
-    // other unsupported setup
-    return super.build();
+  /**
+   * Utilize this method to customize the TracedFilterChainBuilder by specifying the class of the
+   * filter that should be intercepted instead of the default HttpServerFilter.
+   *
+   * @param toWrap the class of the filter to be intercepted
+   * @return the same chain builder to provide a fluent api
+   */
+  public TracedFilterChainBuilder wrapping(Class<? extends BaseFilter> toWrap) {
+    this.toWrapType = toWrap;
+    return this;
   }
 
-  // Methods to facilitate custom instrumentation
-  protected void addTracingFiltersAt(final int index) {
-    final Map<HttpRequestPacket,Span> weakRequestMap = Collections.synchronizedMap(new WeakHashMap<HttpRequestPacket,Span>());
+  /**
+   * Utilize this method to customize the TracedFilterChainBuilder by specifying the index of the
+   * filter that should be intercepted.
+   *
+   * @param toWrapIdx index of the filter to intercept
+   * @return the same chain builder to provide a fluent api
+   */
+  public TracedFilterChainBuilder wrapping(int toWrapIdx) {
+    this.toWrapIdx = toWrapIdx;
+    return this;
+  }
 
+  @Override
+  public FilterChain build() {
+    if (toWrapIdx == -1) {
+      toWrapIdx = this.indexOfType(toWrapType);
+
+      // If no appropriate filter found we give up
+      if (toWrapIdx == -1) {
+        return super.build();
+      }
+    }
+
+    toWrapIdx++;
+    final Map<HttpRequestPacket, Span> weakRequestMap = Collections.synchronizedMap(new WeakHashMap<HttpRequestPacket, Span>());
     final TracingResponseHttpServerFilter responseFilter = new TracingResponseHttpServerFilter(weakRequestMap, tracer);
-    final TracingRequestHttpServerFilter requestFilter = new TracingRequestHttpServerFilter(patternFilterChain.get(index), weakRequestMap, tracer);
+    final TracingRequestHttpServerFilter requestFilter = new TracingRequestHttpServerFilter(patternFilterChain.get(toWrapIdx), weakRequestMap, tracer);
 
-    patternFilterChain.remove(index);
-    patternFilterChain.add(index, requestFilter);
-    patternFilterChain.add(index, responseFilter);
+    patternFilterChain.remove(toWrapIdx);
+    patternFilterChain.add(toWrapIdx, requestFilter);
+    patternFilterChain.add(toWrapIdx, responseFilter);
+    return super.build();
   }
 }
