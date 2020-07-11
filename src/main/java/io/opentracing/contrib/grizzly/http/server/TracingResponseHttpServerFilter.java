@@ -30,6 +30,8 @@ import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.tag.Tags;
 
+import static io.opentracing.contrib.grizzly.http.server.GrizzlyServerSpanDecorator.STANDARD_TAGS;
+
 /**
  * @author Jose Montoya
  */
@@ -51,8 +53,7 @@ public class TracingResponseHttpServerFilter extends BaseFilter {
 			Span toTag = weakRequestMap.get(response.getRequest());
 			if (toTag != null && ! tagged.contains(toTag)) {
 				// If we have not already set appropriate response tags
-				Tags.HTTP_STATUS.set(toTag, response.getStatus());
-
+				STANDARD_TAGS.onResponse(response, toTag);
 				tagged.add(toTag);
 			}
 		}

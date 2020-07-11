@@ -91,7 +91,7 @@ public class TracedFilterChainBuilderTest extends AbstractHttpTest {
 		assertEquals(5, mockSpan.tags().size());
 		assertEquals(Tags.SPAN_KIND_SERVER, mockSpan.tags().get(Tags.SPAN_KIND.getKey()));
 		assertEquals("GET", mockSpan.tags().get(Tags.HTTP_METHOD.getKey()));
-		assertEquals("/", mockSpan.tags().get(Tags.HTTP_URL.getKey()));
+		assertEquals("http://localhost:18906/", mockSpan.tags().get(Tags.HTTP_URL.getKey()));
 		assertEquals(200, mockSpan.tags().get(Tags.HTTP_STATUS.getKey()));
 		assertEquals("java-grizzly-http-server", mockSpan.tags().get(Tags.COMPONENT.getKey()));
 	}

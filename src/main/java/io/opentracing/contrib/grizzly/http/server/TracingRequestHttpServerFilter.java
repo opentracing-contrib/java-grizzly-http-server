@@ -16,7 +16,10 @@ package io.opentracing.contrib.grizzly.http.server;
 import java.io.IOException;
 import java.util.Map;
 
-import io.opentracing.*;
+import io.opentracing.Scope;
+import io.opentracing.Span;
+import io.opentracing.SpanContext;
+import io.opentracing.Tracer;
 import org.glassfish.grizzly.filterchain.Filter;
 import org.glassfish.grizzly.filterchain.FilterChain;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
@@ -26,7 +29,8 @@ import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 
 import io.opentracing.propagation.Format;
-import io.opentracing.tag.Tags;
+
+import static io.opentracing.contrib.grizzly.http.server.GrizzlyServerSpanDecorator.STANDARD_TAGS;
 
 /**
  * @author Jose Montoya
@@ -55,14 +59,11 @@ public class TracingRequestHttpServerFilter implements Filter {
 				final Span span = tracer.buildSpan("HTTP::" + request.getMethod().getMethodString())
 						.ignoreActiveSpan()
 						.asChildOf(extractedContext)
-						.withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
 						.start();
 
 				final Scope scope = tracer.scopeManager().activate(span);
 
-				Tags.COMPONENT.set(span, "java-grizzly-http-server");
-				Tags.HTTP_METHOD.set(span, request.getMethod().getMethodString());
-				Tags.HTTP_URL.set(span, request.getRequestURI());
+				STANDARD_TAGS.onRequest(request, span);
 
 				ctx.addCompletionListener(new FilterChainContext.CompletionListener() {
 					@Override
